@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Follow on Nommey</title>
+  <!-- Smart App Banner: shows "Open in App" bar on iOS Safari if app is installed -->
+  <!-- UPDATE app-id once live on App Store -->
+  <meta name="apple-itunes-app" id="smart-banner" content="app-id=6740261835" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0B0F19;
+      color: #F1F5F9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .logo { color: #1A7A7A; font-size: 28px; font-weight: 900; letter-spacing: -1px; margin-bottom: 32px; }
+    .venue-card {
+      background: #161C2D;
+      border: 1px solid #1E2A3A;
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 360px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    .venue-emoji { font-size: 48px; margin-bottom: 14px; }
+    .venue-name { font-size: 24px; font-weight: 900; color: #F1F5F9; margin-bottom: 6px; }
+    .venue-sub { font-size: 14px; color: #64748B; margin-bottom: 20px; }
+    .divider { height: 1px; background: #1E2A3A; margin: 20px 0; }
+    .follow-msg { font-size: 15px; color: #94A3B8; line-height: 1.5; }
+    .follow-msg strong { color: #1A7A7A; }
+    .open-btn {
+      display: block;
+      background: #1A7A7A;
+      color: #fff;
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 800;
+      padding: 16px 40px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      max-width: 360px;
+      width: 100%;
+    }
+    .store-btn {
+      display: block;
+      background: #161C2D;
+      border: 1px solid #1E2A3A;
+      color: #94A3B8;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 40px;
+      border-radius: 14px;
+      max-width: 360px;
+      width: 100%;
+    }
+    .loading { color: #475569; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="logo">Nommey</div>
+
+  <div class="venue-card">
+    <div class="venue-emoji" id="emoji">🍽️</div>
+    <div class="venue-name" id="venue-name">Loading...</div>
+    <div class="venue-sub" id="venue-sub"></div>
+    <div class="divider"></div>
+    <p class="follow-msg">Follow on Nommey to get <strong>exclusive drops, deals, and loyalty rewards</strong> from this venue directly in your feed.</p>
+  </div>
+
+  <a class="open-btn" id="open-btn" href="#">Open in Nommey</a>
+  <a class="store-btn" href="https://apps.apple.com/us/app/nommey/id6740261835">Download Nommey — Free on iOS</a>
+
+  <script>
+    const SUPABASE_URL = "https://eefidvinsstklnihnuxw.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlZmlkdmluc3N0a2xuaWhudXh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODM3MjQsImV4cCI6MjA4NTY1OTcyNH0.zLEZZndrS5BHznNT4oL89pE0OdvAEAf0XdeMKCzYRms";
+
+    // Extract venue ID from URL: /v/{id}
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const venueId = parts[parts.length - 1];
+
+    if (!venueId) {
+      document.getElementById("venue-name").textContent = "Venue not found";
+    } else {
+      // Set the deep link for "Open in Nommey" button
+      const deepLink = `nommey://venue/${venueId}`;
+      document.getElementById("open-btn").href = deepLink;
+
+      // Update smart banner deep link
+      const banner = document.getElementById("smart-banner");
+      if (banner) {
+        banner.content = `app-id=6740261835, app-argument=${deepLink}`;
+      }
+
+      // Fetch venue info from Supabase
+      fetch(`${SUPABASE_URL}/rest/v1/locations?id=eq.${venueId}&select=name,city,state,venue_type&is_active=eq.true`, {
+        headers: {
+          "apikey": SUPABASE_ANON,
+          "Authorization": `Bearer ${SUPABASE_ANON}`
+        }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data && data[0]) {
+          const v = data[0];
+          document.getElementById("venue-name").textContent = v.name;
+          document.getElementById("venue-sub").textContent = [v.city, v.state].filter(Boolean).join(", ");
+          document.title = `Follow ${v.name} on Nommey`;
+        } else {
+          document.getElementById("venue-name").textContent = "This Venue";
+        }
+      })
+      .catch(() => {
+        document.getElementById("venue-name").textContent = "This Venue";
+      });
+    }
+  </script>
+</body>
+</html>

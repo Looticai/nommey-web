@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "GDJWC48YF9.com.nommey.app",
+        "paths": ["/v/*"]
+      }
+    ]
+  }
+}

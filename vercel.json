@@ -1,0 +1,17 @@
+{
+  "headers": [
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/v/:id", "destination": "/venue.html" }
+  ],
+  "redirects": [
+    { "source": "/", "destination": "/index.html", "permanent": false }
+  ]
+}
