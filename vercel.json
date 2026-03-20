@@ -9,7 +9,8 @@
     }
   ],
   "rewrites": [
-    { "source": "/v/:id", "destination": "/venue.html" }
+    { "source": "/v/:id", "destination": "/venue.html" },
+    { "source": "/privacy", "destination": "/privacy.html" }
   ],
   "redirects": [
     { "source": "/", "destination": "/index.html", "permanent": false }
