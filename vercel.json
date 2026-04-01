@@ -10,7 +10,8 @@
   ],
   "rewrites": [
     { "source": "/v/:id", "destination": "/venue.html" },
-    { "source": "/privacy", "destination": "/privacy.html" }
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/vendor", "destination": "/vendor.html" }
   ],
   "redirects": [
     { "source": "/", "destination": "/index.html", "permanent": false }
