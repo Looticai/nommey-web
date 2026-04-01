@@ -142,6 +142,17 @@
     }
     .plan-btn:hover { opacity: 0.9; }
 
+    /* LOCATION PICKER */
+    .location-picker { display: none; margin-top: 10px; }
+    .location-picker.active { display: block; }
+    .location-picker-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .location-picker select {
+      width: 100%; background: #0B0F19; border: 1px solid var(--border); border-radius: 8px;
+      padding: 11px 14px; color: var(--text); font-size: 14px; margin-bottom: 8px; outline: none;
+      appearance: none;
+    }
+    .location-picker select:focus { border-color: var(--brand); }
+
     /* EMAIL FORM (inline, hidden by default) */
     .email-form { display: none; margin-top: 14px; }
     .email-form.active { display: block; }
@@ -306,6 +317,10 @@
         <div class="email-form" id="form-starter">
           <div class="email-form-note">Use the same email address you signed up with in the Nommey app.</div>
           <input type="email" placeholder="Your Nommey account email" id="email-starter" />
+          <div class="location-picker" id="picker-starter">
+            <div class="location-picker-label">You have multiple locations — select one to subscribe:</div>
+            <select id="location-starter"></select>
+          </div>
           <div class="terms-row">
             <input type="checkbox" id="terms-starter" />
             <label for="terms-starter">I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> and <a href="https://nommey.app/terms" target="_blank">Terms of Service</a></label>
@@ -333,6 +348,10 @@
         <div class="email-form" id="form-standard">
           <div class="email-form-note">Use the same email address you signed up with in the Nommey app.</div>
           <input type="email" placeholder="Your Nommey account email" id="email-standard" />
+          <div class="location-picker" id="picker-standard">
+            <div class="location-picker-label">You have multiple locations — select one to subscribe:</div>
+            <select id="location-standard"></select>
+          </div>
           <div class="terms-row">
             <input type="checkbox" id="terms-standard" />
             <label for="terms-standard">I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> and <a href="https://nommey.app/terms" target="_blank">Terms of Service</a></label>
@@ -368,6 +387,10 @@
         <div class="email-form" id="form-enterprise">
           <div class="email-form-note">Use the same email address you signed up with in the Nommey app.</div>
           <input type="email" placeholder="Your Nommey account email" id="email-enterprise" />
+          <div class="location-picker" id="picker-enterprise">
+            <div class="location-picker-label">You have multiple locations — select one to subscribe:</div>
+            <select id="location-enterprise"></select>
+          </div>
           <div class="terms-row">
             <input type="checkbox" id="terms-enterprise" />
             <label for="terms-enterprise">I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> and <a href="https://nommey.app/terms" target="_blank">Terms of Service</a></label>
@@ -445,10 +468,10 @@
     let activePlan = null;
 
     function selectPlan(btn, planKey) {
-      // Hide all other forms
       ["starter", "standard", "enterprise"].forEach(p => {
         if (p !== planKey) {
           document.getElementById("form-" + p).classList.remove("active");
+          document.getElementById("picker-" + p).classList.remove("active");
         }
       });
       const form = document.getElementById("form-" + planKey);
@@ -467,6 +490,8 @@
       const errorEl = document.getElementById("error-" + planKey);
       const noAccountEl = document.getElementById("noaccount-" + planKey);
       const submitBtn = document.querySelector("#form-" + planKey + " .email-submit");
+      const pickerEl = document.getElementById("picker-" + planKey);
+      const locationSelect = document.getElementById("location-" + planKey);
 
       errorEl.classList.remove("visible");
       noAccountEl.classList.remove("visible");
@@ -485,10 +510,20 @@
         return;
       }
 
+      // If location picker is visible, use the selected locationId directly
+      const selectedLocationId = pickerEl.classList.contains("active") ? locationSelect.value : null;
+
       submitBtn.disabled = true;
       submitBtn.textContent = "Loading...";
 
       try {
+        const body = { planKey, source: "web" };
+        if (selectedLocationId) {
+          body.locationId = selectedLocationId;
+        } else {
+          body.email = email;
+        }
+
         const res = await fetch(SUPABASE_URL + "/functions/v1/create_checkout", {
           method: "POST",
           headers: {
@@ -496,10 +531,21 @@
             "apikey": SUPABASE_ANON_KEY,
             "Authorization": "Bearer " + SUPABASE_ANON_KEY,
           },
-          body: JSON.stringify({ email, planKey, source: "web" }),
+          body: JSON.stringify(body),
         });
 
         const data = await res.json();
+
+        if (data.selectLocation) {
+          // Multiple locations — show picker
+          locationSelect.innerHTML = data.locations
+            .map(l => `<option value="${l.id}">${l.name}</option>`)
+            .join("");
+          pickerEl.classList.add("active");
+          submitBtn.textContent = "Continue to Checkout";
+          submitBtn.disabled = false;
+          return;
+        }
 
         if (!res.ok || data.error) {
           if (res.status === 404 || (data.error && data.error.toLowerCase().includes("no account"))) {
