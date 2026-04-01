@@ -145,12 +145,26 @@
     /* EMAIL FORM (inline, hidden by default) */
     .email-form { display: none; margin-top: 14px; }
     .email-form.active { display: block; }
+    .email-form-note {
+      font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5;
+      background: var(--brand-light); border: 1px solid var(--brand); border-radius: 6px;
+      padding: 8px 10px; color: var(--brand);
+    }
     .email-form input {
       width: 100%; background: #0B0F19; border: 1px solid var(--border); border-radius: 8px;
       padding: 11px 14px; color: var(--text); font-size: 14px; margin-bottom: 8px; outline: none;
     }
     .email-form input:focus { border-color: var(--brand); }
     .email-form input::placeholder { color: var(--subtle); }
+    .terms-row {
+      display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px;
+    }
+    .terms-row input[type="checkbox"] {
+      width: 16px; height: 16px; margin: 0; flex-shrink: 0; margin-top: 2px;
+      accent-color: var(--brand);
+    }
+    .terms-row label { font-size: 12px; color: var(--muted); line-height: 1.5; cursor: pointer; }
+    .terms-row label a { color: #93C5FD; text-decoration: underline; }
     .email-submit {
       width: 100%; background: var(--brand); color: #fff; font-size: 14px; font-weight: 800;
       padding: 11px; border-radius: 8px; border: none; cursor: pointer;
@@ -290,7 +304,12 @@
         </ul>
         <button class="plan-btn" onclick="selectPlan(this, 'starter')">Get Started</button>
         <div class="email-form" id="form-starter">
+          <div class="email-form-note">Use the same email address you signed up with in the Nommey app.</div>
           <input type="email" placeholder="Your Nommey account email" id="email-starter" />
+          <div class="terms-row">
+            <input type="checkbox" id="terms-starter" />
+            <label for="terms-starter">I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> and <a href="https://nommey.app/terms" target="_blank">Terms of Service</a></label>
+          </div>
           <button class="email-submit" onclick="submitPlan('starter')">Continue to Checkout</button>
           <div class="email-error" id="error-starter"></div>
           <div class="email-no-account" id="noaccount-starter">
@@ -312,7 +331,12 @@
         </ul>
         <button class="plan-btn" onclick="selectPlan(this, 'standard')">Get Started</button>
         <div class="email-form" id="form-standard">
+          <div class="email-form-note">Use the same email address you signed up with in the Nommey app.</div>
           <input type="email" placeholder="Your Nommey account email" id="email-standard" />
+          <div class="terms-row">
+            <input type="checkbox" id="terms-standard" />
+            <label for="terms-standard">I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> and <a href="https://nommey.app/terms" target="_blank">Terms of Service</a></label>
+          </div>
           <button class="email-submit" onclick="submitPlan('standard')">Continue to Checkout</button>
           <div class="email-error" id="error-standard"></div>
           <div class="email-no-account" id="noaccount-standard">
@@ -342,7 +366,12 @@
         </ul>
         <button class="plan-btn" onclick="selectPlan(this, 'enterprise')">Get Started</button>
         <div class="email-form" id="form-enterprise">
+          <div class="email-form-note">Use the same email address you signed up with in the Nommey app.</div>
           <input type="email" placeholder="Your Nommey account email" id="email-enterprise" />
+          <div class="terms-row">
+            <input type="checkbox" id="terms-enterprise" />
+            <label for="terms-enterprise">I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> and <a href="https://nommey.app/terms" target="_blank">Terms of Service</a></label>
+          </div>
           <button class="email-submit" onclick="submitPlan('enterprise')">Continue to Checkout</button>
           <div class="email-error" id="error-enterprise"></div>
           <div class="email-no-account" id="noaccount-enterprise">
@@ -445,6 +474,13 @@
       const email = emailInput.value.trim();
       if (!email || !email.includes("@")) {
         errorEl.textContent = "Please enter a valid email address.";
+        errorEl.classList.add("visible");
+        return;
+      }
+
+      const termsChecked = document.getElementById("terms-" + planKey).checked;
+      if (!termsChecked) {
+        errorEl.textContent = "Please agree to the Terms of Service and Privacy Policy to continue.";
         errorEl.classList.add("visible");
         return;
       }

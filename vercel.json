@@ -11,7 +11,8 @@
   "rewrites": [
     { "source": "/v/:id", "destination": "/venue.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/vendor", "destination": "/vendor.html" }
+    { "source": "/vendor", "destination": "/vendor.html" },
+    { "source": "/terms", "destination": "/terms.html" }
   ],
   "redirects": [
     { "source": "/", "destination": "/index.html", "permanent": false }
