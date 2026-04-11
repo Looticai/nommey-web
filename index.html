@@ -20,11 +20,23 @@
       text-align: center;
     }
     .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .logo-img {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      box-shadow: 0 0 0 1px rgba(26,122,122,0.3), 0 8px 24px rgba(26,122,122,0.2);
+    }
+    .logo-text {
       color: #1A7A7A;
       font-size: 36px;
       font-weight: 900;
       letter-spacing: -1px;
-      margin-bottom: 12px;
     }
     .tagline {
       color: #94A3B8;
@@ -71,7 +83,10 @@
   </style>
 </head>
 <body>
-  <div class="logo">Nommey</div>
+  <div class="logo">
+    <img class="logo-img" src="/logo.png" alt="Nommey" />
+    <span class="logo-text">Nommey</span>
+  </div>
   <p class="tagline">Follow local restaurants, bars &amp; cafes. Get exclusive deals, loyalty rewards, and drops first.</p>
 
   <div class="features">
